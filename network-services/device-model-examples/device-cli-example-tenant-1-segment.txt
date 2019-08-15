@@ -1,0 +1,25 @@
+! CLI Configuration for adding a new segment to a tenant 
+vlan 13
+ vn-segment 10003
+!
+evpn
+ vni 10003 l2
+  rd auto
+  route-target import auto
+  route-target export auto
+ !
+!
+interface Vlan13
+ no shutdown
+ vrf member Tenant-1
+ ip address 10.0.13.1/24
+ fabric forwarding mode anycast-gateway
+exit
+interface nve1
+ member vni 10003
+  mcast-group 239.0.0.13
+ !
+!
+interface Ethernet1/4
+ switchport trunk allowed vlan 13
+exit

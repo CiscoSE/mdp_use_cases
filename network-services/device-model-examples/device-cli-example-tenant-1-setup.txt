@@ -1,0 +1,95 @@
+! CLI Configuration for 1 Tenant on EVPN Fabric 
+fabric forwarding anycast-gateway-mac 1234.5678.9000
+! Create VLANs for Tenant 
+vlan 10
+ vn-segment 10000
+!
+vlan 11
+ vn-segment 10001
+!
+vlan 12
+ vn-segment 10002
+!
+
+! Create EVPN Details 
+evpn
+ vni 10001 l2
+  rd auto
+  route-target import auto
+  route-target export auto
+ !
+ vni 10002 l2
+  rd auto
+  route-target import auto
+  route-target export auto
+ !
+!
+
+! Create VRF 
+vrf context Tenant-1
+ vni 10000
+ rd  auto
+ address-family ipv4 unicast
+  route-target both auto evpn
+ exit
+exit
+
+! Create L3 Inrfaces for Tenant 
+interface Vlan10
+ no shutdown
+ vrf member Tenant-1
+ ip forward
+exit
+interface Vlan11
+ no shutdown
+ vrf member Tenant-1
+ ip address 10.0.11.1/24
+ fabric forwarding mode anycast-gateway
+exit
+interface Vlan12
+ no shutdown
+ vrf member Tenant-1
+ ip address 10.0.12.1/24
+ fabric forwarding mode anycast-gateway
+exit
+
+! Create nve
+interface nve1
+ host-reachability protocol bgp
+ member vni 10000 associate-vrf
+ !
+ member vni 10001
+  mcast-group 239.0.0.11
+ !
+ member vni 10002
+  mcast-group 239.0.0.12
+ !
+ no shutdown
+ source-interface loopback0
+!
+
+! Configure physical interfaces for Tenant 
+interface Ethernet1/3
+ switchport mode trunk
+ switchport trunk allowed vlan
+ switchport trunk allowed vlan 11-12
+exit
+interface Ethernet1/4
+ switchport mode trunk
+ switchport trunk allowed vlan
+ switchport trunk allowed vlan 11
+exit
+
+! Update BGP for Tenant 
+router bgp 65001
+ vrf Tenant-1
+  address-family ipv4 unicast
+   advertise l2vpn evpn
+  exit
+ !
+!
+
+
+
+
+

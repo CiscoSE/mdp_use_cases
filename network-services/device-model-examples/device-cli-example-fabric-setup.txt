@@ -1,0 +1,406 @@
+! EVPN Fabric CLI Configuration 
+
+! Spine 1 
+feature nv overlay
+feature pim
+nv overlay evpn
+ip pim anycast-rp 100.2.1.1 10.2.1.5
+ip pim anycast-rp 100.2.1.1 10.2.1.6
+ip pim rp-address 100.2.1.1 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+interface Ethernet1/1
+ ip address 172.16.0.1/30
+ ip ospf network point-to-point
+exit
+router ospf Underlay
+ router-id 10.2.1.5
+!
+interface Ethernet1/1
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/2
+ ip address 172.16.0.5/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/3
+ ip address 172.16.0.9/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/4
+ ip address 172.16.0.13/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface loopback0
+ no shutdown
+ ip address 10.2.1.5/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+interface loopback1
+ no shutdown
+ ip address 100.2.1.1/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+router bgp 65001
+ template peer VTEP-PEERS
+  update-source loopback0
+  address-family ipv4 unicast
+   route-reflector-client
+   send-community both
+  exit
+  address-family l2vpn evpn
+   route-reflector-client
+   send-community both
+  exit
+  remote-as     65001
+ exit
+ router-id 10.2.1.5
+ neighbor 10.2.1.1
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.2
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.3
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.4
+  inherit peer VTEP-PEERS
+ exit
+
+ ! Spine 2 
+ feature nv overlay
+feature pim
+nv overlay evpn
+ip pim anycast-rp 100.2.1.1 10.2.1.5
+ip pim anycast-rp 100.2.1.1 10.2.1.6
+ip pim rp-address 100.2.1.1 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+interface Ethernet1/1
+ ip address 172.16.0.17/30
+ ip ospf network point-to-point
+exit
+router ospf Underlay
+ router-id 10.2.1.6
+!
+interface Ethernet1/1
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/2
+ ip address 172.16.0.21/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/3
+ ip address 172.16.0.25/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/4
+ ip address 172.16.0.29/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface loopback0
+ no shutdown
+ ip address 10.2.1.6/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+interface loopback1
+ no shutdown
+ ip address 100.2.1.1/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+router bgp 65001
+ template peer VTEP-PEERS
+  update-source loopback0
+  address-family ipv4 unicast
+   route-reflector-client
+   send-community both
+  exit
+  address-family l2vpn evpn
+   route-reflector-client
+   send-community both
+  exit
+  remote-as     65001
+ exit
+ router-id 10.2.1.6
+ neighbor 10.2.1.1
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.2
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.3
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.4
+  inherit peer VTEP-PEERS
+ exit
+!
+
+
+! Leaf 1
+feature fabric forwarding
+feature nv overlay
+feature pim
+feature vn-segment-vlan-based
+feature interface-vlan
+nv overlay evpn
+ip pim rp-address 100.2.1.1 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+interface Vlan1
+ no shutdown
+exit
+interface Ethernet1/1
+ ip address 172.16.0.2/30
+ ip ospf network point-to-point
+exit
+router ospf Underlay
+ router-id 10.2.1.1
+!
+interface Ethernet1/1
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/2
+ ip address 172.16.0.18/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface loopback0
+ no shutdown
+ ip address 10.2.1.1/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+interface loopback1
+ no shutdown
+ ip address 100.2.1.2/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+router bgp 65001
+ template peer VTEP-PEERS
+  update-source loopback0
+  address-family ipv4 unicast
+   send-community both
+  exit
+  address-family l2vpn evpn
+   send-community both
+  exit
+  remote-as     65001
+ exit
+ router-id 10.2.1.1
+ neighbor 10.2.1.5
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.6
+  inherit peer VTEP-PEERS
+ exit
+!
+
+
+! Leaf 2 
+feature fabric forwarding
+feature nv overlay
+feature pim
+feature vn-segment-vlan-based
+feature interface-vlan
+nv overlay evpn
+ip pim rp-address 100.2.1.1 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+interface Vlan1
+ no shutdown
+exit
+interface Ethernet1/1
+ ip address 172.16.0.6/30
+ ip ospf network point-to-point
+exit
+router ospf Underlay
+ router-id 10.2.1.2
+!
+interface Ethernet1/1
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/2
+ ip address 172.16.0.22/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface loopback0
+ no shutdown
+ ip address 10.2.1.2/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+interface loopback1
+ no shutdown
+ ip address 100.2.1.3/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+router bgp 65001
+ template peer VTEP-PEERS
+  update-source loopback0
+  address-family ipv4 unicast
+   send-community both
+  exit
+  address-family l2vpn evpn
+   send-community both
+  exit
+  remote-as     65001
+ exit
+ router-id 10.2.1.2
+ neighbor 10.2.1.5
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.6
+  inherit peer VTEP-PEERS
+ exit
+!
+
+! Leaf 3 
+feature fabric forwarding
+feature nv overlay
+feature pim
+feature vn-segment-vlan-based
+feature interface-vlan
+nv overlay evpn
+ip pim rp-address 100.2.1.1 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+interface Vlan1
+ no shutdown
+exit
+interface Ethernet1/1
+ ip address 172.16.0.10/30
+ ip ospf network point-to-point
+exit
+router ospf Underlay
+ router-id 10.2.1.3
+!
+interface Ethernet1/1
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/2
+ ip address 172.16.0.26/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface loopback0
+ no shutdown
+ ip address 10.2.1.3/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+interface loopback1
+ no shutdown
+ ip address 100.2.1.4/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+router bgp 65001
+ template peer VTEP-PEERS
+  update-source loopback0
+  address-family ipv4 unicast
+   send-community both
+  exit
+  address-family l2vpn evpn
+   send-community both
+  exit
+  remote-as     65001
+ exit
+ router-id 10.2.1.3
+ neighbor 10.2.1.5
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.6
+  inherit peer VTEP-PEERS
+ exit
+!
+
+
+! Leaf 4 
+feature fabric forwarding
+feature nv overlay
+feature pim
+feature vn-segment-vlan-based
+feature interface-vlan
+nv overlay evpn
+ip pim rp-address 100.2.1.1 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+interface Vlan1
+ no shutdown
+exit
+interface Ethernet1/1
+ ip address 172.16.0.14/30
+ ip ospf network point-to-point
+exit
+router ospf Underlay
+ router-id 10.2.1.4
+!
+interface Ethernet1/1
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface Ethernet1/2
+ ip address 172.16.0.30/30
+ ip ospf network point-to-point
+ ip router ospf Underlay area 0.0.0.0
+ ip pim sparse-mode
+ mtu 9216
+exit
+interface loopback0
+ no shutdown
+ ip address 10.2.1.4/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+interface loopback1
+ no shutdown
+ ip address 100.2.1.5/32
+ ip router ospf Underlay area 0.0.0.0
+exit
+router bgp 65001
+ template peer VTEP-PEERS
+  update-source loopback0
+  address-family ipv4 unicast
+   send-community both
+  exit
+  address-family l2vpn evpn
+   send-community both
+  exit
+  remote-as     65001
+ exit
+ router-id 10.2.1.4
+ neighbor 10.2.1.5
+  inherit peer VTEP-PEERS
+ exit
+ neighbor 10.2.1.6
+  inherit peer VTEP-PEERS
+ exit
+!
+

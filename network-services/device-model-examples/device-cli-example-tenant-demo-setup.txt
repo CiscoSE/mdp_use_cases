@@ -1,0 +1,95 @@
+! Device CLI Configuration to Add New Tenant 
+
+! Leaf 1 
+vlan 14
+ vn-segment 10004
+!
+vlan 15
+ vn-segment 10005
+!
+vlan 16
+ vn-segment 10006
+!
+vlan 17
+ vn-segment 10007
+!
+evpn
+ vni 10005 l2
+  rd auto
+  route-target import auto
+  route-target export auto
+ !
+ vni 10006 l2
+  rd auto
+  route-target import auto
+  route-target export auto
+ !
+ vni 10007 l2
+  rd auto
+  route-target import auto
+  route-target export auto
+ !
+!
+vrf context Demo-Tenant
+ vni 10004
+ rd  auto
+ address-family ipv4 unicast
+  route-target both auto evpn
+ exit
+exit
+interface Vlan14
+ no shutdown
+ vrf member Demo-Tenant
+ ip forward
+exit
+interface Vlan15
+ no shutdown
+ vrf member Demo-Tenant
+ ip address 10.0.1.1/24
+ fabric forwarding mode anycast-gateway
+exit
+interface Vlan16
+ no shutdown
+ vrf member Demo-Tenant
+ ip address 10.0.2.1/24
+ fabric forwarding mode anycast-gateway
+exit
+interface Vlan17
+ no shutdown
+ vrf member Demo-Tenant
+ ip address 10.0.3.1/24
+ fabric forwarding mode anycast-gateway
+exit
+interface nve1
+ member vni 10004 associate-vrf
+ !
+ member vni 10005
+  mcast-group 239.0.0.15
+ !
+ member vni 10006
+  mcast-group 239.0.0.16
+ !
+ member vni 10007
+  mcast-group 239.0.0.17
+ !
+!
+interface Ethernet1/11
+ switchport mode trunk
+ switchport trunk allowed vlan
+ switchport trunk allowed vlan 15-17
+exit
+interface Ethernet1/12
+ switchport mode access
+ switchport access vlan 15
+exit
+interface Ethernet1/13
+ switchport mode access
+ switchport access vlan 17
+exit
+router bgp 65001
+ vrf Demo-Tenant
+  address-family ipv4 unicast
+   advertise l2vpn evpn
+  exit
+ !
+!

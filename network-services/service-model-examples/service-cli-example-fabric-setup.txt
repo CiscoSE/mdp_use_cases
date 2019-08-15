@@ -1,0 +1,33 @@
+vxlan-fabric fabric1
+pim-pool      100.2.1.0/24
+loopback-pool 10.2.1.0/24
+interior-pool 172.16.0.0/16
+!
+spines spine1
+connections leaf1 interface 1/1
+connections leaf2 interface 1/2
+connections leaf3 interface 1/3
+connections leaf4 interface 1/4
+!
+spines spine2
+connections leaf1 interface 1/1
+connections leaf2 interface 1/2
+connections leaf3 interface 1/3
+connections leaf4 interface 1/4
+!
+leaves leaf1 
+connections spine1 interface 1/1
+connections spine2 interface 1/2
+!
+leaves leaf2
+connections spine1 interface 1/1
+connections spine2 interface 1/2
+!
+leaves leaf3 
+connections spine1 interface 1/1
+connections spine2 interface 1/2
+!
+leaves leaf4 
+connections spine1 interface 1/1
+connections spine2 interface 1/2
+!

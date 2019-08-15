@@ -1,0 +1,34 @@
+vxlan-tenant Demo-Tenant
+fabric fabric1
+
+segments production01
+network      10.0.1.0/24
+suppress-arp false
+connection leaf1 1/11
+connection leaf2 1/11
+connection leaf3 1/11
+connection leaf4 1/11
+connection leaf1 1/12 mode access
+connection leaf2 1/12 mode access
+
+segments production02
+network      10.0.2.0/24
+suppress-arp false
+connection leaf1 1/11
+connection leaf2 1/11
+connection leaf3 1/11
+connection leaf4 1/11
+connection leaf3 1/12 mode access
+connection leaf4 1/12 mode access
+
+segments production03
+network      10.0.3.0/24
+suppress-arp false
+connection leaf1 1/11
+connection leaf2 1/11
+connection leaf3 1/11
+connection leaf4 1/11
+connection leaf1 1/13 mode access
+connection leaf2 1/13 mode access
+connection leaf3 1/13 mode access
+connection leaf4 1/13 mode access

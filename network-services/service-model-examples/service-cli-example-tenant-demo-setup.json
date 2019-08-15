@@ -1,0 +1,121 @@
+{
+  "data": {
+    "vxlan-tenant:vxlan-tenant": [
+      {
+        "name": "Demo-Tenant",
+        "fabric": "fabric1",
+        "segments": [
+          {
+            "name": "production01",
+            "network": "10.0.1.0/24",
+            "suppress-arp": false,
+            "connection": [
+              {
+                "leaf": "leaf1",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf1",
+                "iface": "1/12",
+                "mode": "access"
+              },
+              {
+                "leaf": "leaf2",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf2",
+                "iface": "1/12",
+                "mode": "access"
+              },
+              {
+                "leaf": "leaf3",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf4",
+                "iface": "1/11"
+              }
+            ]
+          },
+          {
+            "name": "production02",
+            "network": "10.0.2.0/24",
+            "suppress-arp": false,
+            "connection": [
+              {
+                "leaf": "leaf1",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf2",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf3",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf3",
+                "iface": "1/12",
+                "mode": "access"
+              },
+              {
+                "leaf": "leaf4",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf4",
+                "iface": "1/12",
+                "mode": "access"
+              }
+            ]
+          },
+          {
+            "name": "production03",
+            "network": "10.0.3.0/24",
+            "suppress-arp": false,
+            "connection": [
+              {
+                "leaf": "leaf1",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf1",
+                "iface": "1/13",
+                "mode": "access"
+              },
+              {
+                "leaf": "leaf2",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf2",
+                "iface": "1/13",
+                "mode": "access"
+              },
+              {
+                "leaf": "leaf3",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf3",
+                "iface": "1/13",
+                "mode": "access"
+              },
+              {
+                "leaf": "leaf4",
+                "iface": "1/11"
+              },
+              {
+                "leaf": "leaf4",
+                "iface": "1/13",
+                "mode": "access"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

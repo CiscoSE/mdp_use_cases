@@ -19,6 +19,7 @@ feature telnet
 feature nxapi
 feature bash-shell
 feature scp-server
+feature ospf
 
 no password strength-check
 username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
@@ -36,6 +37,37 @@ interface mgmt0
   mac-address fa16.3e01.0007
   no shutdown
   vrf member management
+
+interface Ethernet1/1
+  no switchport
+  ip address 10.0.2.5/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+
+interface Ethernet1/3
+  no switchport
+  ip address 10.0.2.1/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+
+interface Ethernet1/5
+  no switchport
+  ip address 10.0.1.2/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+
+interface Ethernet1/6
+  no switchport
+  ip address 10.0.1.10/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+
+interface loopback0
+  ip address 10.255.255.3/32
+  ip router ospf 100 area 0.0.0.75
+
+router ospf 100
+  router-id 10.255.255.3
 
 </entry>
         </extensions>
@@ -62,6 +94,7 @@ feature telnet
 feature nxapi
 feature bash-shell
 feature scp-server
+feature ospf
 
 no password strength-check
 username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
@@ -79,6 +112,29 @@ interface mgmt0
   mac-address fa16.3e03.0007
   no shutdown
   vrf member management
+
+router ospf 100
+  router-id 10.255.255.5
+
+interface Ethernet1/1
+  no switchport
+  ip address 10.0.2.6/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet1/2
+  no switchport
+  ip address 10.0.2.10/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+
+interface loopback0
+  ip address 10.255.255.5/32
+  ip router ospf 100 area 0.0.0.75
+interface loopback75
+  ip address 192.168.185.200/32
+  ip route ospf 100 area 0.0.0.75
+
+
 </entry>
         </extensions>
         <interface id="0" name="Ethernet1/1"/>
@@ -101,6 +157,7 @@ interface mgmt0
   feature nxapi
   feature bash-shell
   feature scp-server
+  feature ospf
 
   no password strength-check
   username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
@@ -118,6 +175,38 @@ interface mgmt0
     mac-address fa16.3e02.0007
     no shutdown
     vrf member management
+
+ interface loopback0
+  ip address 10.255.255./32
+  ip router ospf 100 area 0.0.0.75
+
+interface Ethernet1/1
+  no switchport
+  ip address 10.0.2.9/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet1/2
+interface Ethernet1/3
+  no switchport
+  ip address 10.0.2.2/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet1/4
+interface Ethernet1/5
+  no switchport
+  ip address 10.0.1.14/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet1/6
+  no switchport
+  ip address 10.0.1.6/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+
+router ospf 100
+  router-id 10.255.255.4
+
+
 </entry>
         </extensions>
         <interface id="0" name="Ethernet1/1"/>
@@ -190,23 +279,61 @@ interface GigabitEthernet1
 
 ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
 !
+username bryan privilege 2 password 0 cisco
+username hank privilege 15 password 0 cisco
+
+interface Loopback0
+ ip address 10.255.255.1 255.255.255.255
+interface Loopback250000
+ ip address 172.16.8.1 255.255.255.0
+interface Loopback250001
+ ip address 172.16.9.1 255.255.255.0
+interface Loopback250002
+ ip address 172.16.10.1 255.255.255.0
+interface Loopback250003
+ ip address 172.16.11.1 255.255.255.0
+
 interface GigabitEthernet2
-  description to dist1
-  no shutdown
-!
+ description to dist1
+ ip address 10.0.1.1 255.255.255.252
+ ip access-group IMPACT in
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
+ no shut
 interface GigabitEthernet3
-  description to dist2
-  no shutdown
-!
+ description to dist2
+ ip address 10.0.1.5 255.255.255.252
+ ip access-group IMPACT in
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
+ no shut
 interface GigabitEthernet4
-  description core2
-  no ip address
-  no shutdown
-!
-interface Loopback 0
-!
-!
-!
+ description core2
+ ip address 10.0.0.1 255.255.255.252
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
+ no shut
+
+router ospf 100
+ router-id 10.255.255.1
+ network 10.0.0.0 0.0.0.255 area 0
+ network 10.0.1.0 0.0.0.255 area 75
+ network 10.255.0.0 0.0.255.255 area 0
+ network 172.16.0.0 0.0.255.255 area 0
+
+ip access-list extended IMPACT
+ permit ospf any any
+ permit icmp any 172.16.11.0 0.0.0.255
+ deny   ip any 172.16.0.0 0.0.255.255
+ permit ip any 10.255.255.0 0.0.0.255
+ deny   ip any any
+
 end</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet2" ipv4="10.0.0.5" netPrefixLenV4="30"/>
@@ -289,9 +416,55 @@ interface GigabitEthernet4
   no ip address
   no shutdown
 !
-interface Loopback 0
-!
-!
+interface GigabitEthernet2
+ description to dist1
+ ip address 10.0.1.13 255.255.255.252
+ ip access-group IMPACT in
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
+ no shut
+interface GigabitEthernet3
+ description to dist2
+ ip address 10.0.1.9 255.255.255.252
+ ip access-group IMPACT in
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
+ no shut
+interface GigabitEthernet4
+ description core2
+ ip address 10.0.0.2 255.255.255.252
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
+ no shut
+ interface Loopback250000
+  ip address 172.16.20.1 255.255.255.0
+ interface Loopback250001
+  ip address 172.16.21.1 255.255.255.0
+ interface Loopback250002
+  ip address 172.16.22.1 255.255.255.0
+ interface Loopback250003
+  ip address 172.16.23.1 255.255.255.0
+  router ospf 100
+   router-id 10.255.255.2
+   network 10.0.0.0 0.0.0.255 area 0
+   network 10.0.1.0 0.0.0.255 area 75
+   network 10.255.0.0 0.0.255.255 area 0
+   network 172.16.0.0 0.0.255.255 area 0
+   ip access-list extended IMPACT
+   permit ospf any any
+   deny   ip any 172.16.0.0 0.0.255.255
+   permit ip any 10.255.255.0 0.0.0.255
+   deny   ip any any
+
+   username bryan privilege 2 password 0 cisco
+   username hank privilege 15 password 0 cisco
+
 !
 end</entry>
         </extensions>

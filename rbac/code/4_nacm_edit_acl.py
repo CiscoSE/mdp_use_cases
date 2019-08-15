@@ -23,7 +23,7 @@ with open("nacm_edit_acl.j2") as f:
     acl_template = Template(f.read())
 
 for entry in entries:
-    acl_config = acl_template.render(aces=entry["aces"], acl_name=entry["acl_name"])
+    acl_config = acl_template.render(aces=entry["aces"], acl_name=entry["name"])
 
     with manager.connect(
             host=device["address"],

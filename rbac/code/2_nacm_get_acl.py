@@ -49,7 +49,6 @@ with manager.connect(
     acl_name = acl_desc["access-lists"]["access-list"]
     acl_match = acl_desc["access-lists"]["access-list"]["access-list-entries"]["access-list-entry"]
 
-    print(xml.dom.minidom.parseString(results.xml).toprettyxml())
 
     # Process the xml data into a readable format.
     print("Access-List Name: {}".format(acl_name["access-control-list-name"]["#text"]))

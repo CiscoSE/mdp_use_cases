@@ -1,0 +1,22 @@
+---
+
+- acl:
+  name: IMPACT
+  aces:
+    - seq: 125
+      action: permit
+      protocol: icmp
+      src_prefix: any
+      src_wildcard:
+      dst_prefix: 172.16.11.1
+      dst_wildcard: 0.0.0.255
+
+#- acl_name: IMPACT
+#  aces:
+#  - seq: 125
+#    action: permit
+#    protocol: icmp
+#    src_prefix:
+#    src_wildcard:
+#    dst_prefix: 172.16.12.1
+#    dst_wildcard: 0.0.255.255

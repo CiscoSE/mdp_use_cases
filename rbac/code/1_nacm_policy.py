@@ -68,6 +68,6 @@ with manager.connect(
     print("")
 
     # Add new rules
-    print("Configuring NACM Rule to allow PRIV01 to GET")
+    print("Configuring NACM Rule to allow PRIV02 to GET")
     r = m.edit_config(target="running", config=data)
     print("NETCONF RPC OK: {}".format(r.ok))

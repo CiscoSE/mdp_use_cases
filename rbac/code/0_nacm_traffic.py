@@ -9,7 +9,7 @@ from getpass import getpass
 # }
 
 device = {
-    "address": "172.16.30.177",
+    "address": "172.16.30.126",
     "username": "cisco",
     "password": "cisco"
 }
@@ -24,8 +24,11 @@ for i in range(100):
                         password=device["password"],
                         port=22) as ch:
 
-        ping_permit = ch.send_command("ping 10.255.255.1 count 10")
-        ping_deny = ch.send_command("ping 172.16.11.1 count 10")
+        ping_permit = ch.send_command("ping 10.255.255.1")
+        ping_deny = ch.send_command("ping 172.16.11.1")
+
+        print(ping_deny)
+        print(ping_permit)
 
 
 

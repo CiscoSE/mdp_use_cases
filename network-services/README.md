@@ -115,15 +115,15 @@ If you were to configure a VXLAN-EVPN fabric and tenants without a network servi
 
 #### Step 1: Configuring the Fabric
 
-Before you could add tenants, you need to configure the basic fabric and underlay.  Take a look at the sample CLI based configurations for setting up a fabric.  These are located in the [`device-model-exmaples/device-cli-example-fabric-setup.txt`](device-model-exmaples/device-cli-example-fabric-setup.txt) file in this repo.  You will find there are about 400 total lines of configuration needed across the 6 nodes in the fabric.  Much of this configuration is feature specific and repetitive. 
+Before you could add tenants, you need to configure the basic fabric and underlay.  Take a look at the sample CLI based configurations for setting up a fabric.  These are located in the [`device-model-examples/device-cli-example-fabric-setup.txt`](device-model-examples/device-cli-example-fabric-setup.txt) file in this repo.  You will find there are about 400 total lines of configuration needed across the 6 nodes in the fabric.  Much of this configuration is feature specific and repetitive. 
 
 #### Step 2: Adding a Tenant to the Fabric 
 
-Once the fabric is setup and functional, now you can add Tenants and their network segments to the fabric.  Again, this could be done using CLI or device interfaces.  Take a look at [`device-model-exmaples/device-cli-example-tenant-1-setup.txt`](device-model-exmaples/device-cli-example-tenant-1-setup.txt) for a basic Tenant initialization.  This tenant inludes 2 network segments, and a few ports on one of the leafs in the fabric.  Even for this small of a Tenant, there is a lot of device based configuration that needs to be generated.  
+Once the fabric is setup and functional, now you can add Tenants and their network segments to the fabric.  Again, this could be done using CLI or device interfaces.  Take a look at [`device-model-examples/device-cli-example-tenant-1-setup.txt`](device-model-examples/device-cli-example-tenant-1-setup.txt) for a basic Tenant initialization.  This tenant inludes 2 network segments, and a few ports on one of the leafs in the fabric.  Even for this small of a Tenant, there is a lot of device based configuration that needs to be generated.  
 
 #### Step 2a: Adding a Network Segment to an Existing Tenant 
 
-Let's suppose you wanted to add a new segment to an existing tenant.  Checkout the configuration needed to accomplish this task by looking at [`device-model-exmaples/device-cli-example-tenant-1-segment.txt`](device-model-exmaples/device-cli-example-tenant-1-segment.txt)
+Let's suppose you wanted to add a new segment to an existing tenant.  Checkout the configuration needed to accomplish this task by looking at [`device-model-examples/device-cli-example-tenant-1-segment.txt`](device-model-examples/device-cli-example-tenant-1-segment.txt)
 
 ### Now a better way... Network Services. 
 

@@ -1,5 +1,6 @@
 # Repo specific
 *.code-workspace
+.vscode
 
 .virl/
 *.retry

@@ -1,5 +1,9 @@
 # Repo specific
 *.code-workspace
+srv_env
+default_testbed.yaml
+.idea
+
 
 .virl/
 *.retry
@@ -133,3 +137,5 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+

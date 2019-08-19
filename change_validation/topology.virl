@@ -101,6 +101,7 @@ router ospf 100
  network 10.255.0.0 0.0.255.255 area 0
  network 172.16.0.0 0.0.255.255 area 0
  network 10.0.3.0 0.0.0.3 area 0
+ redistribute bgp 64512 subnets
 !
 ip access-list extended IMPACT
  100 permit ospf any any
@@ -244,6 +245,8 @@ router ospf 100
  network 10.255.0.0 0.0.255.255 area 0
  network 172.16.0.0 0.0.255.255 area 0
  network 10.0.3.0 0.0.0.255 area 0
+ redistribute bgp 64512 subnets
+
 
 ip access-list extended IMPACT
  100 permit ospf any any
@@ -820,17 +823,6 @@ interface loopback0
 router ospf 100
   router-id 10.255.255.3
 
-router bgp 64512
-  router-id 10.255.255.3
-  neighbor 10.255.255.1 remote-as 64512
-    update-source loopback0
-    address-family ipv4 unicast
-  neighbor 10.255.255.2 remote-as 64512
-    update-source loopback0
-    address-family ipv4 unicast
-  neighbor 10.255.255.4 remote-as 64512
-    update-source loopback0
-    address-family ipv4 unicast
 
 </entry>
         </extensions>
@@ -913,19 +905,9 @@ interface loopback0
 router ospf 100
   router-id 10.255.255.4
 
-feature bgp
 
-router bgp 64512
-  router-id 10.255.255.4
-  neighbor 10.255.255.1 remote-as 64512
-    update-source loopback0
-    address-family ipv4 unicast
-  neighbor 10.255.255.2 remote-as 64512
-    update-source loopback0
-    address-family ipv4 unicast
-  neighbor 10.255.255.3 remote-as 64512
-    update-source loopback0
-    address-family ipv4 unicast</entry>
+
+    </entry>
         </extensions>
         <interface id="0" name="Ethernet2/1"/>
         <interface id="1" name="Ethernet2/2"/>

@@ -244,6 +244,7 @@ no aaa new-model
 !
 !
 ipv6 unicast-routing
+netconf-yang
 !
 !
 service timestamps debug datetime msec
@@ -328,11 +329,10 @@ router ospf 100
  network 172.16.0.0 0.0.255.255 area 0
 
 ip access-list extended IMPACT
- permit ospf any any
- permit icmp any 172.16.11.0 0.0.0.255
- deny   ip any 172.16.0.0 0.0.255.255
- permit ip any 10.255.255.0 0.0.0.255
- deny   ip any any
+ 100 permit ospf any any
+ 200 deny   ip any 172.16.0.0 0.0.255.255
+ 300 permit ip any 10.255.255.0 0.0.0.255
+ 1000 deny   ip any any
 
 end</entry>
         </extensions>
@@ -368,6 +368,7 @@ no aaa new-model
 !
 !
 ipv6 unicast-routing
+netconf-yang
 !
 !
 service timestamps debug datetime msec
@@ -450,17 +451,19 @@ interface GigabitEthernet4
   ip address 172.16.22.1 255.255.255.0
  interface Loopback250003
   ip address 172.16.23.1 255.255.255.0
+
   router ospf 100
    router-id 10.255.255.2
    network 10.0.0.0 0.0.0.255 area 0
    network 10.0.1.0 0.0.0.255 area 75
    network 10.255.0.0 0.0.255.255 area 0
    network 172.16.0.0 0.0.255.255 area 0
-   ip access-list extended IMPACT
-   permit ospf any any
-   deny   ip any 172.16.0.0 0.0.255.255
-   permit ip any 10.255.255.0 0.0.0.255
-   deny   ip any any
+
+ip access-list extended IMPACT
+ 100 permit ospf any any
+ 200 deny   ip any 172.16.0.0 0.0.255.255
+ 300 permit ip any 10.255.255.0 0.0.0.255
+ 1000 deny   ip any any
 
    username bryan privilege 2 password 0 cisco
    username hank privilege 15 password 0 cisco

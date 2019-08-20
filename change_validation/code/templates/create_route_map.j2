@@ -1,0 +1,23 @@
+<config>
+  <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+    <route-map>
+      <name>{{ name }}</name>
+        {% for entry in entries -%}
+      <route-map-without-order-seq xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-route-map">
+        <seq_no>{{ entry.seq }}</seq_no>
+        <operation>permit</operation>
+        <set>
+          <local-preference>{{ entry.local_pref }}</local-preference>
+        </set>
+        <match>
+          <ip>
+            <address>
+              <prefix-list>{{ entry.prefix_match }}</prefix-list>
+            </address>
+          </ip>
+        </match>
+      </route-map-without-order-seq>
+      {% endfor -%}
+    </route-map>
+  </native>
+</config>

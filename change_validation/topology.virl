@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.95" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.95/virl.xsd">
+    <extensions>
+        <entry key="management_lxc" type="Boolean">false</entry>
+        <entry key="management_network" type="String">flat</entry>
+    </extensions>
+    <node name="core1" type="SIMPLE" subtype="CSR1000v" location="370,354">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">hostname core1
+boot-start-marker
+boot-end-marker
+!
+vrf definition Mgmt-intf
+!
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+!
+license accept end user agreement
+license boot level premium
+!
+!
+no aaa new-model
+!
+!
+ipv6 unicast-routing
+!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+no service config
+enable password cisco
+enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
+ip classless
+ip subnet-zero
+no ip domain lookup
+crypto key generate rsa modulus 1024
+ip ssh server algorithm authentication password
+username cisco privilege 15 secret cisco
+line vty 0 4
+ transport input ssh telnet
+ exec-timeout 720 0
+ password cisco
+ login local
+line con 0
+ password cisco
+!
+!
+interface GigabitEthernet1
+  description OOB Management
+  vrf forwarding Mgmt-intf
+  ! Configured on launch
+  no ip address
+  cdp enable
+  no shutdown
+
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+!
+username bryan privilege 2 password 0 cisco
+username hank privilege 15 password 0 cisco
+!
+netconf-yang
+!
+interface Loopback0
+ ip address 10.255.255.1 255.255.255.255
+interface Loopback250000
+ ip address 172.16.8.1 255.255.255.0
+interface Loopback250001
+ ip address 172.16.9.1 255.255.255.0
+interface Loopback250002
+ ip address 172.16.10.1 255.255.255.0
+interface Loopback250003
+ ip address 172.16.11.1 255.255.255.0
+interface GigabitEthernet2
+ description to dist1
+ ip address 10.0.1.1 255.255.255.252
+ no shutdown
+interface GigabitEthernet3
+ description to dist2
+ ip address 10.0.1.5 255.255.255.252
+ no shutdown
+interface GigabitEthernet4
+ description core2
+ ip address 10.0.0.1 255.255.255.252
+ no shutdown
+interface GigabitEthernet5
+ description to edge1
+ ip address 10.0.3.1 255.255.255.252
+ no shutdown
+!
+router ospf 100
+ router-id 10.255.255.1
+ network 10.0.0.0 0.0.0.255 area 0
+ network 10.0.1.0 0.0.0.255 area 75
+ network 10.255.0.0 0.0.255.255 area 0
+ network 172.16.0.0 0.0.255.255 area 0
+ network 10.0.3.0 0.0.0.3 area 0
+ redistribute bgp 64512 subnets
+!
+ip access-list extended IMPACT
+ 100 permit ospf any any
+ 200 deny   ip any 172.16.0.0 0.0.255.255
+ 300 permit ip any 10.255.255.0 0.0.0.255
+ 1000 deny   ip any any
+!
+router bgp 64512
+ bgp router-id interface Loopback0
+ bgp log-neighbor-changes
+ neighbor 10.0.3.2 remote-as 65000
+ neighbor 10.255.255.2 remote-as 64512
+ neighbor 10.255.255.2 update-source Loopback0
+ neighbor 10.255.255.3 remote-as 64512
+ neighbor 10.255.255.3 update-source Loopback0
+ neighbor 10.255.255.4 remote-as 64512
+ neighbor 10.255.255.4 update-source Loopback0
+ !
+ address-family ipv4
+  network 172.16.8.0 mask 255.255.255.0
+  network 172.16.9.0 mask 255.255.255.0
+  network 172.16.10.0 mask 255.255.255.0
+  network 172.16.11.0 mask 255.255.255.0
+  network 172.16.20.0 mask 255.255.255.0
+  network 172.16.21.0 mask 255.255.255.0
+  network 172.16.22.0 mask 255.255.255.0
+  network 172.16.23.0 mask 255.255.255.0
+  network 192.168.185.0 mask 255.255.255.0
+  neighbor 10.0.3.2 activate
+  neighbor 10.0.3.2 route-map INBOUND in
+  neighbor 10.0.3.2 route-map OUTBOUND out
+  neighbor 10.255.255.2 activate
+  neighbor 10.255.255.3 activate
+  neighbor 10.255.255.4 activate
+ exit-address-family
+!
+route-map OUTBOUND permit 1000
+route-map INBOUND permit 1000
+
+</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet2"/>
+        <interface id="1" name="GigabitEthernet3"/>
+        <interface id="2" name="GigabitEthernet4"/>
+        <interface id="3" name="GigabitEthernet5"/>
+    </node>
+    <node name="core2" type="SIMPLE" subtype="CSR1000v" location="742,359">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">hostname core2
+boot-start-marker
+boot-end-marker
+!
+vrf definition Mgmt-intf
+!
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+!
+license accept end user agreement
+license boot level premium
+!
+!
+no aaa new-model
+!
+!
+ipv6 unicast-routing
+!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+no service config
+enable password cisco
+enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
+ip classless
+ip subnet-zero
+no ip domain lookup
+crypto key generate rsa modulus 1024
+ip ssh server algorithm authentication password
+username cisco privilege 15 secret cisco
+line vty 0 4
+ transport input ssh telnet
+ exec-timeout 720 0
+ password cisco
+ login local
+line con 0
+ password cisco
+!
+!
+interface GigabitEthernet1
+  description OOB Management
+  vrf forwarding Mgmt-intf
+  ! Configured on launch
+  no ip address
+  cdp enable
+  no shutdown
+
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+!
+username bryan privilege 2 password 0 cisco
+username hank privilege 15 password 0 cisco
+!
+netconf-yang
+!
+interface Loopback0
+ ip address 10.255.255.2 255.255.255.255
+interface Loopback250000
+ ip address 172.16.20.1 255.255.255.0
+interface Loopback250001
+ ip address 172.16.21.1 255.255.255.0
+interface Loopback250002
+ ip address 172.16.22.1 255.255.255.0
+interface Loopback250003
+ ip address 172.16.23.1 255.255.255.0
+interface GigabitEthernet2
+ description to dist1
+ ip address 10.0.1.13 255.255.255.252
+ no shutdown
+interface GigabitEthernet3
+ description to dist2
+ ip address 10.0.1.9 255.255.255.252
+ no shutdown
+interface GigabitEthernet4
+ description core2
+ ip address 10.0.0.2 255.255.255.252
+ no shutdown
+interface GigabitEthernet5
+ description edge2
+ ip address 10.0.3.5 255.255.255.252
+ no shutdown
+!
+router ospf 100
+ router-id 10.255.255.2
+ network 10.0.0.0 0.0.0.255 area 0
+ network 10.0.1.0 0.0.0.255 area 75
+ network 10.255.0.0 0.0.255.255 area 0
+ network 172.16.0.0 0.0.255.255 area 0
+ network 10.0.3.0 0.0.0.255 area 0
+ redistribute bgp 64512 subnets
+
+
+ip access-list extended IMPACT
+ 100 permit ospf any any
+ 200 deny   ip any 172.16.0.0 0.0.255.255
+ 300 permit ip any 10.255.255.0 0.0.0.255
+ 1000 deny   ip any any
+
+ router bgp 64512
+  bgp router-id interface Loopback0
+  bgp log-neighbor-changes
+  neighbor 10.0.3.6 remote-as 65333
+  neighbor 10.255.255.1 remote-as 64512
+  neighbor 10.255.255.1 update-source Loopback0
+  neighbor 10.255.255.3 remote-as 64512
+  neighbor 10.255.255.3 update-source Loopback0
+  neighbor 10.255.255.4 remote-as 64512
+  neighbor 10.255.255.4 update-source Loopback0
+  !
+  address-family ipv4
+   network 172.16.8.0 mask 255.255.255.0
+   network 172.16.9.0 mask 255.255.255.0
+   network 172.16.10.0 mask 255.255.255.0
+   network 172.16.11.0 mask 255.255.255.0
+   network 172.16.20.0 mask 255.255.255.0
+   network 172.16.21.0 mask 255.255.255.0
+   network 172.16.22.0 mask 255.255.255.0
+   network 172.16.23.0 mask 255.255.255.0
+   network 192.168.185.0 mask 255.255.255.0
+   neighbor 10.0.3.6 activate
+   neighbor 10.0.3.6 route-map INBOUND in
+   neighbor 10.0.3.6 route-map OUTBOUND out
+   neighbor 10.255.255.1 activate
+   neighbor 10.255.255.3 activate
+   neighbor 10.255.255.4 activate
+  exit-address-family
+
+route-map OUTBOUND permit 1000
+route-map INBOUND permit 1000</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet2"/>
+        <interface id="1" name="GigabitEthernet3"/>
+        <interface id="2" name="GigabitEthernet4"/>
+        <interface id="3" name="GigabitEthernet5"/>
+    </node>
+    <node name="edge1" type="SIMPLE" subtype="CSR1000v" location="369,227">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">hostname edge1
+boot-start-marker
+boot-end-marker
+!
+vrf definition Mgmt-intf
+!
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+!
+license accept end user agreement
+license boot level premium
+!
+!
+no aaa new-model
+!
+!
+ipv6 unicast-routing
+!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+no service config
+enable password cisco
+enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
+ip classless
+ip subnet-zero
+no ip domain lookup
+crypto key generate rsa modulus 1024
+ip ssh server algorithm authentication password
+username cisco privilege 15 secret cisco
+line vty 0 4
+ transport input ssh telnet
+ exec-timeout 720 0
+ password cisco
+ login local
+line con 0
+ password cisco
+!
+no cdp run
+!
+!
+interface GigabitEthernet1
+  description OOB Management
+  vrf forwarding Mgmt-intf
+  ! Configured on launch
+  no ip address
+  cdp enable
+  no shutdown
+
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+!
+interface Loopback0
+ ip address 10.255.255.6 255.255.255.255
+interface GigabitEthernet2
+ description to core1
+ ip address 10.0.3.2 255.255.255.252
+ no shutdown
+interface GigabitEthernet3
+ description to inet
+ ip address 10.0.4.1 255.255.255.252
+ no shutdown
+
+router bgp 65000
+ bgp router-id interface Loopback0
+ bgp log-neighbor-changes
+ neighbor 10.0.3.1 remote-as 64512
+ neighbor 10.0.4.2 remote-as 3356
+ !
+ address-family ipv4
+  neighbor 10.0.3.1 activate
+  neighbor 10.0.4.2 activate
+ exit-address-family</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet2"/>
+        <interface id="1" name="GigabitEthernet3"/>
+    </node>
+    <node name="edge2" type="SIMPLE" subtype="CSR1000v" location="741,224">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">hostname edge2
+boot-start-marker
+boot-end-marker
+!
+vrf definition Mgmt-intf
+!
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+!
+license accept end user agreement
+license boot level premium
+!
+!
+no aaa new-model
+!
+!
+ipv6 unicast-routing
+!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+no service config
+enable password cisco
+enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
+ip classless
+ip subnet-zero
+no ip domain lookup
+crypto key generate rsa modulus 1024
+ip ssh server algorithm authentication password
+username cisco privilege 15 secret cisco
+line vty 0 4
+ transport input ssh telnet
+ exec-timeout 720 0
+ password cisco
+ login local
+line con 0
+ password cisco
+!
+no cdp run
+!
+!
+interface GigabitEthernet1
+  description OOB Management
+  vrf forwarding Mgmt-intf
+  ! Configured on launch
+  no ip address
+  cdp enable
+  no shutdown
+
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+!
+interface Loopback0
+ ip address 10.255.255.7 255.255.255.255
+interface GigabitEthernet2
+ description to core2
+ ip address 10.0.3.6 255.255.255.252
+ no shutdown
+interface GigabitEthernet3
+ description to inet
+ ip address 10.0.4.5 255.255.255.252
+ no shutdown
+
+router bgp 65333
+ bgp router-id interface Loopback0
+ neighbor 10.0.3.5 remote-as 64512
+ neighbor 10.0.4.6 remote-as 3356
+ !
+ address-family ipv4
+  neighbor 10.0.3.5 activate
+  neighbor 10.0.4.6 activate
+</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet2"/>
+        <interface id="1" name="GigabitEthernet3"/>
+    </node>
+    <node name="inet" type="SIMPLE" subtype="CSR1000v" location="532,102">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">hostname inet
+boot-start-marker
+boot-end-marker
+!
+vrf definition Mgmt-intf
+!
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+!
+license accept end user agreement
+license boot level premium
+!
+!
+no aaa new-model
+!
+!
+ipv6 unicast-routing
+!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+no service config
+enable password cisco
+enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
+ip classless
+ip subnet-zero
+no ip domain lookup
+crypto key generate rsa modulus 1024
+ip ssh server algorithm authentication password
+username cisco privilege 15 secret cisco
+line vty 0 4
+ transport input ssh telnet
+ exec-timeout 720 0
+ password cisco
+ login local
+line con 0
+ password cisco
+!
+no cdp run
+!
+!
+interface GigabitEthernet1
+  description OOB Management
+  vrf forwarding Mgmt-intf
+  ! Configured on launch
+  no ip address
+  cdp enable
+  no shutdown
+
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+!
+interface Loopback0
+ ip address 10.255.255.8 255.255.255.255
+interface GigabitEthernet2
+ description to edge1
+ ip address 10.0.4.2 255.255.255.252
+ no shutdown
+interface GigabitEthernet3
+ description to edge2
+ ip address 10.0.4.6 255.255.255.252
+ no shutdown
+interface GigabitEthernet4
+ description to sp1
+ ip address 10.0.5.1 255.255.255.252
+ no shutdown
+interface GigabitEthernet5
+ description to sp2
+ ip add 10.0.5.5 255.255.255.252
+ no shutdown
+
+router bgp 3356
+ bgp router-id interface Loopback0
+ bgp log-neighbor-changes
+ neighbor 10.0.4.1 remote-as 65000
+ neighbor 10.0.4.5 remote-as 65333
+ neighbor 10.0.5.2 remote-as 701
+ neighbor 10.0.5.6 remote-as 13979
+ !
+ address-family ipv4
+  neighbor 10.0.4.1 activate
+  neighbor 10.0.4.5 activate
+  neighbor 10.0.5.2 activate
+  neighbor 10.0.5.6 activate
+ exit-address-family
+</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet2"/>
+        <interface id="1" name="GigabitEthernet3"/>
+        <interface id="2" name="GigabitEthernet4"/>
+        <interface id="3" name="GigabitEthernet5"/>
+    </node>
+    <node name="sp1" type="SIMPLE" subtype="CSR1000v" location="399,39">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">hostname sp1
+boot-start-marker
+boot-end-marker
+!
+vrf definition Mgmt-intf
+!
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+!
+license accept end user agreement
+license boot level premium
+!
+!
+no aaa new-model
+!
+!
+ipv6 unicast-routing
+!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+no service config
+enable password cisco
+enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
+ip classless
+ip subnet-zero
+no ip domain lookup
+crypto key generate rsa modulus 1024
+ip ssh server algorithm authentication password
+username cisco privilege 15 secret cisco
+line vty 0 4
+ transport input ssh telnet
+ exec-timeout 720 0
+ password cisco
+ login local
+line con 0
+ password cisco
+!
+no cdp run
+!
+!
+interface GigabitEthernet1
+  description OOB Management
+  vrf forwarding Mgmt-intf
+  ! Configured on launch
+  no ip address
+  cdp enable
+  no shutdown
+
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+!
+interface Loopback0
+ ip address 10.255.255.9 255.255.255.255
+interface GigabitEthernet2
+ ip address 10.0.5.2 255.255.255.252
+ no shutdown
+interface GigabitEthernet3
+ ip address 10.0.6.1 255.255.255.252
+ no shutdown
+!
+interface Loopback24916
+ ip address 65.249.16.1 255.255.255.0
+interface Loopback24917
+ ip address 65.249.17.1 255.255.255.0
+interface Loopback24918
+ ip address 65.249.18.1 255.255.255.0
+interface Loopback24919
+ ip address 65.249.19.1 255.255.255.0
+
+router bgp 701
+ bgp router-id interface Loopback0
+ neighbor 10.0.5.1 remote-as 3356
+ neighbor 10.0.6.2 remote-as 13979
+ !
+ address-family ipv4
+  neighbor 10.0.5.1 activate
+  neighbor 10.0.6.2 activate
+  no redistribute connected
+  network 65.249.16.0 mask 255.255.255.0
+  network 65.249.17.0 mask 255.255.255.0
+  network 65.249.18.0 mask 255.255.255.0
+  network 65.249.19.0 mask 255.255.255.0
+
+</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet2"/>
+        <interface id="1" name="GigabitEthernet3"/>
+    </node>
+    <node name="sp2" type="SIMPLE" subtype="CSR1000v" location="668,44">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">hostname sp2
+boot-start-marker
+boot-end-marker
+!
+vrf definition Mgmt-intf
+!
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+!
+license accept end user agreement
+license boot level premium
+!
+!
+no aaa new-model
+!
+!
+ipv6 unicast-routing
+!
+!
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+no service config
+enable password cisco
+enable secret 4 tnhtc92DXBhelxjYk8LWJrPV36S2i4ntXrpb4RFmfqY
+ip classless
+ip subnet-zero
+no ip domain lookup
+crypto key generate rsa modulus 1024
+ip ssh server algorithm authentication password
+username cisco privilege 15 secret cisco
+line vty 0 4
+ transport input ssh telnet
+ exec-timeout 720 0
+ password cisco
+ login local
+line con 0
+ password cisco
+!
+no cdp run
+!
+!
+interface GigabitEthernet1
+  description OOB Management
+  vrf forwarding Mgmt-intf
+  ! Configured on launch
+  no ip address
+  cdp enable
+  no shutdown
+
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+!
+interface Loopback0
+ ip address 10.255.255.10 255.255.255.255
+interface GigabitEthernet2
+ ip address 10.0.5.6 255.255.255.252
+ no shutdown
+interface GigabitEthernet3
+ ip address 10.0.6.2 255.255.255.252
+ no shutdown
+interface Loopback154128
+ ip address 209.154.128.1 255.255.255.0
+interface Loopback154129
+ ip address 209.154.129.1 255.255.255.0
+interface Loopback154130
+ ip address 209.154.130.1 255.255.255.0
+interface Loopback154131
+ ip address 209.154.131.1 255.255.255.0
+!
+router bgp 13979
+ bgp router-id interface Loopback0
+ neighbor 10.0.5.5 remote-as 3356
+ neighbor 10.0.6.1 remote-as 701
+ !
+ address-family ipv4
+  neighbor 10.0.5.5 activate
+  neighbor 10.0.6.1 activate
+  no redistribute connected
+  network 209.154.128.0 mask 255.255.255.0
+  network 209.154.129.0 mask 255.255.255.0
+  network 209.154.130.0 mask 255.255.255.0
+  network 209.154.131.0 mask 255.255.255.0</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet2"/>
+        <interface id="1" name="GigabitEthernet3"/>
+    </node>
+    <node name="dist1" type="SIMPLE" subtype="NX-OSv" location="371,464">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">power redundancy-mode combined force
+license grace-period
+
+hostname dist1
+
+feature telnet
+feature nxapi
+feature bash-shell
+feature scp-server
+feature bgp
+feature ospf
+
+no password strength-check
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-admin
+no ip domain-lookup
+
+vrf context management
+  ip route 0.0.0.0/0 {{ gateway }}
+hardware forwarding unicast trace
+
+interface mgmt0
+  description OOB Management
+  ! Configured on launch
+  no ip address
+  mac-address fa16.3e01.0007
+  no shutdown
+  vrf member management
+
+feature ospf
+feature interface-vlan
+!
+interface Vlan75
+  no shutdown
+  ip address 192.168.185.2/24
+  ip router ospf 100 area 0.0.0.75
+  hsrp 30
+    preempt
+    priority 50
+    ip 192.168.185.1
+interface Ethernet2/1
+  no switchport
+  ip address 10.0.1.2/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet2/2
+  no switchport
+  ip address 10.0.1.14/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet2/3
+  no switchport
+  ip address 10.0.2.1/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet2/4
+  shutdown
+interface Ethernet2/5
+  no switchport
+  ip address 10.0.2.5/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface loopback0
+  ip address 10.255.255.3/32
+  ip router ospf 100 area 0.0.0.75
+!
+router ospf 100
+  router-id 10.255.255.3
+
+
+</entry>
+        </extensions>
+        <interface id="0" name="Ethernet2/1"/>
+        <interface id="1" name="Ethernet2/2"/>
+        <interface id="2" name="Ethernet2/3"/>
+        <interface id="3" name="Ethernet2/4"/>
+        <interface id="4" name="Ethernet2/5"/>
+    </node>
+    <node name="dist2" type="SIMPLE" subtype="NX-OSv" location="743,470">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">power redundancy-mode combined force
+license grace-period
+
+hostname dist2
+
+feature telnet
+feature nxapi
+feature bash-shell
+feature scp-server
+feature ospf
+feature bgp
+
+no password strength-check
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-admin
+no ip domain-lookup
+
+vrf context management
+  ip route 0.0.0.0/0 {{ gateway }}
+hardware forwarding unicast trace
+
+interface mgmt0
+  description OOB Management
+  ! Configured on launch
+  no ip address
+  mac-address fa16.3e01.0007
+  no shutdown
+  vrf member management
+
+feature ospf
+feature interface-vlan
+!
+interface Vlan75
+  no shutdown
+  ip address 192.168.185.3/24
+  ip router ospf 100 area 0.0.0.75
+  ip ospf passive-interface
+  hsrp 30
+    preempt
+    priority 50
+    ip 192.168.185.1
+interface Ethernet2/1
+  no switchport
+  ip address 10.0.1.6/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet2/2
+  no switchport
+  ip address 10.0.1.10/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet2/3
+  no switchport
+  ip address 10.0.2.2/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet2/4
+  shutdown
+interface Ethernet2/5
+  no switchport
+  ip address 10.0.2.9/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface loopback0
+  ip address 10.255.255.4/32
+  ip router ospf 100 area 0.0.0.75
+!
+router ospf 100
+  router-id 10.255.255.4
+
+
+
+    </entry>
+        </extensions>
+        <interface id="0" name="Ethernet2/1"/>
+        <interface id="1" name="Ethernet2/2"/>
+        <interface id="2" name="Ethernet2/3"/>
+        <interface id="3" name="Ethernet2/4"/>
+        <interface id="4" name="Ethernet2/5"/>
+    </node>
+    <node name="access1" type="SIMPLE" subtype="NX-OSv" location="552,597">
+        <extensions>
+            <entry key="AutoNetkit.ASN" type="Integer">1</entry>
+            <entry key="config" type="String">power redundancy-mode combined force
+
+license grace-period
+
+hostname access1
+
+feature telnet
+feature nxapi
+feature bash-shell
+feature scp-server
+
+no password strength-check
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-admin
+no ip domain-lookup
+
+vrf context management
+  ip route 0.0.0.0/0 {{ gateway }}
+hardware forwarding unicast trace
+
+interface mgmt0
+  description OOB Management
+  ! Configured on launch
+  no ip address
+  mac-address fa16.3e03.0007
+  no shutdown
+  vrf member management
+
+feature interface-vlan
+feature ospf
+!
+interface Ethernet2/1
+  no switchport
+  ip address 10.0.2.6/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Ethernet2/2
+  no switchport
+  ip address 10.0.2.10/30
+  ip router ospf 100 area 0.0.0.75
+  no shutdown
+interface Vlan75
+  no shutdown
+  ip address 192.168.185.200/24
+  ip router ospf 100 area 0.0.0.75
+interface loopback0
+  ip address 10.255.255.5/32
+  ip router ospf 100 area 0.0.0.75
+router ospf 100
+ router-id 10.255.255.5
+</entry>
+        </extensions>
+        <interface id="0" name="Ethernet2/1"/>
+        <interface id="1" name="Ethernet2/2"/>
+    </node>
+    <annotations/>
+    <connection dst="/virl:topology/virl:node[7]/virl:interface[1]" src="/virl:topology/virl:node[5]/virl:interface[4]"/>
+    <connection dst="/virl:topology/virl:node[8]/virl:interface[4]" src="/virl:topology/virl:node[9]/virl:interface[4]"/>
+    <connection dst="/virl:topology/virl:node[10]/virl:interface[2]" src="/virl:topology/virl:node[9]/virl:interface[5]"/>
+    <connection dst="/virl:topology/virl:node[8]/virl:interface[2]" src="/virl:topology/virl:node[2]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[9]/virl:interface[2]" src="/virl:topology/virl:node[2]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[8]/virl:interface[1]" src="/virl:topology/virl:node[1]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[9]/virl:interface[1]" src="/virl:topology/virl:node[1]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[2]/virl:interface[3]" src="/virl:topology/virl:node[1]/virl:interface[3]"/>
+    <connection dst="/virl:topology/virl:node[2]/virl:interface[4]" src="/virl:topology/virl:node[4]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[1]/virl:interface[4]" src="/virl:topology/virl:node[3]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[5]/virl:interface[3]" src="/virl:topology/virl:node[6]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[9]/virl:interface[3]" src="/virl:topology/virl:node[8]/virl:interface[3]"/>
+    <connection dst="/virl:topology/virl:node[10]/virl:interface[1]" src="/virl:topology/virl:node[8]/virl:interface[5]"/>
+    <connection dst="/virl:topology/virl:node[3]/virl:interface[2]" src="/virl:topology/virl:node[5]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[4]/virl:interface[2]" src="/virl:topology/virl:node[5]/virl:interface[2]"/>
+    <connection dst="/virl:topology/virl:node[7]/virl:interface[2]" src="/virl:topology/virl:node[6]/virl:interface[2]"/>
+</topology>

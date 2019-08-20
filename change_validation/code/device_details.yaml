@@ -1,0 +1,23 @@
+---
+devices:
+
+  - name: core2
+    device_type: 'cisco_ios'
+    ip: '172.16.30.230'
+    username: 'cisco'
+    password: 'cisco'
+    prefix_name: PREF_EDGE2
+    prefixes:
+      - seq: 100
+        action: permit
+        prefix: 209.154.128.0
+        len: 22
+        keyword: min
+        min: 24
+        max:
+    route_map:
+      name: INBOUND
+      map_seq:
+        - seq: 116
+          prefix_match: PREF_EDGE2
+          local_pref: 500

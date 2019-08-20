@@ -1,0 +1,32 @@
+<config>
+  <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+    <ip>
+      <access-list>
+        <extended xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-acl">
+          <name>{{ acl_name }}</name>
+          {% for ace in aces -%}
+          <access-list-seq-rule>
+              <sequence>{{ ace.seq }}</sequence>
+              <ace-rule>
+                <action>{{ ace.action }}</action>
+                <protocol>{{ ace.protocol }}</protocol>
+                {% if ace.src_prefix == "any" -%}
+                <any/>
+                {% else -%}
+                <ipv4-address>{{ ace.src_prefix }}</ipv4-address>
+                <mask>{{ ace.src_wildcard }}</mask>
+                {% endif -%}
+                {% if ace.dst_prefix == "any" -%}
+                <dst-any/>
+                {% else -%}
+                <dest-ipv4-address>{{ ace.dst_prefix }}</dest-ipv4-address>
+                <dest-mask>{{ ace.dst_wildcard }}</dest-mask>
+                {% endif -%}
+              </ace-rule>
+            </access-list-seq-rule>
+        {% endfor -%}
+        </extended>
+      </access-list>
+    </ip>
+  </native>
+</config>

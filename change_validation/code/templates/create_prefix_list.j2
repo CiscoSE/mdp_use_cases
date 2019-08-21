@@ -1,0 +1,28 @@
+<config>
+    <native xmlns="http://cisco.com/ns/yang/Cisco-IOS-XE-native">
+      <ip>
+        <prefix-list>
+          <prefixes>
+            <name>{{ name }}</name>
+            {% for prefix in prefixes -%}
+            <seq>
+              <no>{{ prefix.seq }}</no>
+              <{{ prefix.action }}>
+                <ip>{{ prefix.prefix }}/{{ prefix.len }}</ip>
+                {% if prefix.keyword == "max" -%}
+                <ge>{{ prefix.max }}</ge>
+                {% elif prefix.keyword == "min" -%}
+                <le>{{ prefix.min }}</le>
+                {% elif prefix.keyword == "minmax" -%}
+                <ge>{{ prefix.max }}</ge>
+                <le>{{ prefix.min }}</le>
+                {% else -%}
+                {% endif -%}
+              </{{ prefix.action }}>
+            </seq>
+            {% endfor -%}
+          </prefixes>
+        </prefix-list>
+      </ip>
+    </native>
+</config>

@@ -1,6 +1,9 @@
 # Repo specific
 *.code-workspace
 .vscode
+srv_env
+default_testbed.yaml
+.idea
 
 .virl/
 *.retry

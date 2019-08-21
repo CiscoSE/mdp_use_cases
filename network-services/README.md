@@ -5,6 +5,8 @@ This demo shows how model driven programmability can offer even better experienc
 
 The network service in this demonstration is the creation and management of a VXLAN-EVPN fabric to offer multi-tenancy across a data center network.  
 
+![demo_resources/evpn-fabric.jpg](demo_resources/evpn-fabric.jpg)
+
 ## Demo Preperation 
 In order to run this demo you'll need to have installed Cisco NSO on your workstation.  You can download and find installation instructions for free up on [DevNet: NSO Getting Started](https://developer.cisco.com/docs/nso/#!getting-nso).  You will need to have either Linux or MacOS platforms to install NSO.  
 

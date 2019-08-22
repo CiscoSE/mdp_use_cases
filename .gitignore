@@ -4,6 +4,9 @@
 srv_env
 default_testbed.yaml
 .idea
+venv_rbac/
+venv_chg
+
 
 .virl/
 *.retry
@@ -18,6 +21,8 @@ nso*.zip
 nso-4*/
 TaskLog.html
 default_testbed.yaml
+.virlrc
+
 
 logs/
 ncs-cdb/

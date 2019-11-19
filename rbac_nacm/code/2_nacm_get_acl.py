@@ -84,7 +84,7 @@ with manager.connect(
             print(" For ACE: {}".format(ace["sequence"]))
             print("  Protocol: {}".format(ace["ace-rule"]["protocol"]))
             print("   Destination Network: {}".format(ace["ace-rule"]["dest-ipv4-address"]))
-            print("   Destinaiton Wildcard Mask: {}".format(ace["ace-rule"]["dest-mask"]))
+            print("   Destination Wildcard Mask: {}".format(ace["ace-rule"]["dest-mask"]))
             print("   Source Network: {}".format(ace["ace-rule"]["ipv4-address"]))
             print("   Source Wildcard Mask: {}".format(ace["ace-rule"]["mask"]))
             print("   Action: {}".format(ace["ace-rule"]["action"]))

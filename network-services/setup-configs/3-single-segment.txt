@@ -1,0 +1,6 @@
+vxlan-tenant Tenant-1
+
+segments Seg3
+network      10.0.13.0/24
+suppress-arp false
+connection leaf1 1/4

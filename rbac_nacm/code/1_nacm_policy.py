@@ -103,7 +103,7 @@ with manager.connect(
 
     # Display NACM after making the changes
     r = m.get(filter)
-    print("NACM Configuratiton After Defining PRIV02 Policy.")
+    print("NACM Configuration After Defining PRIV02 Policy.")
     xml_doc = minidom.parseString(r.xml)
     print(xml_doc.toprettyxml(indent="  "))
     print("")

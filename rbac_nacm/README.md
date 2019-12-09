@@ -1,16 +1,16 @@
 # Network Configuration Access Control Demo
 
-This demo shows how model driven programmability can be extended outside of service turn up. There are significant benefits to leveraging model driven programmability into traditional help desk/operational work flows provided there is a method for providing Role Based Access Control (RBAC). 
+This demo shows how model driven programmability can be extended outside of service turn up. There are significant benefits to leveraging model driven programmability into traditional help desk/operational workflows provided there is a method for providing Role Based Access Control (RBAC). 
 
-RFC 6536 provides a frame work for providing RBAC by restricting access to specific NETCONF actions (get, get-config, edit-config, etc.), data stores (running, candidate, etc.) or specific YANG modules. Buy default only users with PRIV15 are granted access to interact with the device through NETCONF/YANG. 
+RFC 6536 provides a framework for providing RBAC by restricting access to specific NETCONF actions (get, get-config, edit-config, etc), data stores (running, candidate, etc) or specific YANG modules. By default only users with privilege level 15 are granted access to interact with the device through NETCONF/YANG. 
 
 In this demo we will simulate a typical help desk function where a junior operations engineer has access to retrieve configuration and operational details from a device for troubleshooting but they must escalate to a senior engineer to provide the 'fix'.
 
-## Demo Prepration
+## Demo Preparation
 
-The network topology for this demo was built using Cisco VIRL a network simulation platform. If you do not have your own VIRL server available you the demo was written and tested using [DevNet Sandbox Multi-IOS Test Network](https://devnetsandbox.cisco.com/RM/Diagram/Index/6b023525-4e7f-4755-81ae-05ac500d464a?diagramType=Topology) and you are encouraged to reserve a free instance of this lab. 
+The network topology for this demo was built using Cisco VIRL, a network simulation platform. If you do not have your own VIRL server available, the demo was written and tested using [DevNet Sandbox Multi-IOS Test Network](https://devnetsandbox.cisco.com/RM/Diagram/Index/6b023525-4e7f-4755-81ae-05ac500d464a?diagramType=Topology) and you are encouraged to reserve a free instance of this lab. 
 
-Before starting the lab update the ```srv_env.template``` file with the IP address, username and password used to access your instance of VIRL and source the file. Once complete start the VIRL instance with ```virl up```
+Before starting the lab update the ```srv_env.template``` file with the IP address, username and password used to access your instance of VIRL and source the file. Once complete, start the VIRL instance with ```virl up```
 
 There is a python script in the code directory that is used to generate pseudo network traffic. Before starting the demo run the ```0_nacm_traffic.py``` script in a background terminal. The username and password is ```cisco/cisco```.
 
@@ -22,17 +22,17 @@ A user has opened up a ticket stating that they are unable to access a resource 
 
 ## Step 1 - Implementing Role Based Access Control in a Model Driven World
 
-As stated previously, by default, only users authorized at privilege level 15 are able to interact with NETCONF/YANG. A users privilege level can be assigned statically through a locally defined user account or it can be returned as part of a TACACS authentication. For the purpose of our demo there are two users
+As stated previously, by default, only users authorized at privilege level 15 are able to interact with NETCONF/YANG. A user's privilege level can be assigned statically through a locally defined user account or it can be returned as part of a TACACS authentication. For the purpose of our demo there are two users:
 
-**Bryan** - a junior help desk engineer who only has read access to 
-network devices
+**Bryan** - A junior help desk engineer who only has read access to 
+network devices.
 
 ```
 username - bryan
 password - cisco
 ```
 
-**Hank** - a senior escalation contact who has full read/write access to the network
+**Hank** - A senior escalation contact who has full read/write access to the network.
 
 ```
 username - hank
@@ -56,17 +56,17 @@ Let's run the code and define our policy for PRIV02 users.
 python 1_nacm_policy.py
 ```
 
-Supply the IP address for the device core1 and the username password combination for our senior engineer (hank/cisco) and then re run the code for the device core2.
+Supply the IP address for the device core1 and the username/password combination for our senior engineer (hank/cisco) and then re run the code for the device core2.
 
 Now that we have our policy in place let's walk through a model driven troubleshooting.
 
 ### The Scenario ###
 
-A user has opened up a ticket stating that they are unable to access a resource at 172.16.11.1. The ticket was routed a new help desk engineer and they are tasked with triaging the issue. Once they identify the problem they need to escalate the issue to a senior engineer to apply the appropriate configuration change.
+A user has opened up a ticket stating that they are unable to access a resource at 172.16.11.1. The ticket was routed to a new help desk engineer and they are tasked with triaging the issue. Once they identify the problem they need to escalate the issue to a senior engineer to apply the appropriate configuration change.
 
 ## Step 2 - Verifying the Configuration
 
-In this step we will use a pre-defined script to retrieve the ACL configuration of a device in path. While we are focusing on retrieving details for what amounts to a single show command the power of using model driven programmability in a "real" environment is having this part of a larger script designed to retrieve details for multiple functions on a platform.
+In this step we will use a pre-defined script to retrieve the ACL configuration of a device in the path. While we are focusing on retrieving details for what amounts to a single show command the power of using model driven programmability in a "real" environment is having this part of a larger script designed to retrieve details for multiple functions on a platform.
 
 With that let's run our script using the account details of our PRIV02 level user ```bryan/cisco```
 
@@ -100,15 +100,15 @@ Access-List Name: IMPACT
 
 ```
 
-The script returns a short summary of the currently configured access-list. Our operator can now quickly scan through the list and see that ACE number 30 is likely denying our user from getting access to the host 172.16.11.
+The script returns a short summary of the currently configured access-list. Our operator can now quickly scan through the list and see that ACE number 200 is likely denying our user from getting access to the host 172.16.11.1
 
 Feel free to investigate the code to see how the NETCONF filter was defined.
 
 ## Step 3 - Real Time Monitoring with Model Driven Programmability
 
-Before escalating our ticket up to the Senior engineer our help desk engineer would like to check for incrementing hits on the ACE counter for sequence number 200. We are now moving away from an all purpose script to requiring something custom to retrieve details on what is may be a device specific configuration. In this case we will leverage a python script using a Jinja template that prompts the operator to provide inputs on specifically what details they need.
+Before escalating our ticket up to the senior engineer our help desk engineer would like to check for incrementing hits on the ACE counter for sequence number 200. We are now moving away from an all purpose script to requiring something custom to retrieve details on what is may be a device specific configuration. In this case we will leverage a python script using a Jinja template that prompts the operator to provide inputs on specifically what details they need.
 
-Before we run our code let's look at the code specifically the portion for that reads in the Jinja Template
+Before we run our code let's look at the code, specifically the portion for that reads in the Jinja Template
 
 ```
 cat 3_nacm_get_seq.py
@@ -153,7 +153,7 @@ If we let our script run we should see incrementing hits on our ACL sequence num
 
 ## Step 4 - Updating the Access List
 
-Our junior help desk engineer is very happy he's identified the issue on the network and like any good engineer he doesn't want to hand off the issue to a peer. He wants to see this issue through to resolution. He knows that all the provisioning scripts are available in a git repository so he's determined to push the fix out.
+Our junior help desk engineer is very happy he's identified the issue on the network and, like any good engineer, he doesn't want to hand off the issue to a peer. He wants to see this issue through to resolution. He knows that all the provisioning scripts are available in a git repository so he's determined to push the fix out.
 
 For our configuration script the change details are stored in a YAML file. Our help desk engineer updated the YAML and he's ready to deploy the change. Let's take a look at what the change will look like:
 
@@ -198,7 +198,7 @@ Operator Password?
 NETCONF RPC OK: True
 ```
 
-As any good senior engineer should do Hank runs through some verification scripts to ensure his change had the desired effect.
+As any good senior engineer should do, Hank runs through some verification scripts to ensure his change had the desired effect.
 
 ```
 (venv) $ python 2_nacm_get_acl.py 

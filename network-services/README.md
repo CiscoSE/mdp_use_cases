@@ -5,28 +5,39 @@ This demo shows how model driven programmability can offer even better experienc
 
 The network service in this demonstration is the creation and management of a VXLAN-EVPN fabric to offer multi-tenancy across a data center network.  
 
-![demo_resources/evpn-fabric.jpg](demo_resources/evpn-fabric.jpg)
+<p align="center"> 
+<img src="demo_resources/evpn-fabric.jpg">
+</p>
 
-## Demo Preperation 
-In order to run this demo you'll need to have installed Cisco NSO on your workstation.  You can download and find installation instructions for free up on [DevNet: NSO Getting Started](https://developer.cisco.com/docs/nso/#!getting-nso).  You will need to have either Linux or MacOS platforms to install NSO.  
+## Demo Preparation 
+In order to run this demo you will need to have Cisco NSO installed on your workstation.  You can download the latest NSO version and find installation instructions for free up on [DevNet: NSO Getting Started](https://developer.cisco.com/docs/nso/#!getting-nso).  You will need to have either Linux or MacOS platforms to install NSO. 
 
-> Note: The creation and value of "network services" can be done leveraging multiple tools, both open source and commercial.  Cisco NSO is used in this example as an example platform for network service based configuration management.  
+Your NSO version needs to be 4.6 or higher. For reference, my installed NSO version is 4.7.6 and you may download it from [here](https://software.cisco.com/download/home/286321297/type/286283941/release/4.7.6) (please make sure to reboot your workstation after installation).
 
-There are two flavors for this demonstration, `dev` and `test`.  
+For the demo to run correctly we will need python 3.x (it's about time, huh?). If your python version is not 3.x (you may check with `python -V`) you can always use a [virtual environment](https://virtualenv.pypa.io/en/latest/):
 
-For `dev` the network used to deploy the service to is a simulated set of devices that leverages `netsim`, a component of NSO and will run on your workstation.  
+```
+virtualenv p3 --python=python3
+source ./p3/bin/activate
+```
+
+> Note: The creation and value of "network services" can be done leveraging multiple tools, both open-source and commercial.  Cisco NSO is used in this example as an example platform for network service-based configuration management.  
+
+There are two options, or _flavors_, to run this demonstration: `dev` and `test`.  You may use one or the other, but please make sure not to run them consecutively as you will not get the expected results.
+
+For `dev` the network used to deploy the service to is a simulated set of devices that leverages `netsim`, a component of NSO that will run locally on your workstation.  
 
 For `test` the network used is a virtualized network using Cisco VIRL.  If you have your own VIRL server available, you can use it.  However the demo was written and tested using the [DevNet Sandbox Multi-IOS Test Network](https://devnetsandbox.cisco.com/RM/Diagram/Index/6b023525-4e7f-4755-81ae-05ac500d464a?diagramType=Topology) and you are encouraged to reserve a free instance of this lab if you'd like to use the `test` variation. 
 
-### Variation `dev` 
-For this variation, the spine/leaf network is simulated through netsim.  This provides a management plane into the network for sending and managing device configurations, but no data or control plane will be available.  The steps to prepare and setup are: 
+### Option #1: `dev` 
+For this variation, the spine/leaf network is simulated through _netsim_.  This provides a management plane into the network for sending and managing device configurations, but no data or control plane will be available.  The steps to prepare and setup are: 
 
 1. Setup and start a netsim network on your workstation 
-1. Setup a local NSO instance on your workstation  (it will automatically link to netsim)
+1. Setup a local NSO instance on your workstation  (it will automatically link to netsim simulations)
 
-To simplify these steps `make dev` has been provided within the `Makefile` for this demo to prepare the full dev network.  Before running `make test`, be sure to have NSO properly installed.
+To simplify these steps `make dev` has been provided within the `Makefile` for this demo to prepare the full dev network.  Before running `make dev`, be sure to have NSO properly installed.
 
-At the end of `make dev` you should an output similar to this indicating the test network up up in VIRL and that NSO is connected to it.  
+At the end of `make dev` you should see an output similar to the one below, indicating the test network is up in VIRL and that NSO is connected to it.  
 
 ```
 Here are your netsim node status.
@@ -54,16 +65,16 @@ spine1  127.0.0.1  -            cisco-nx  unlocked
 spine2  127.0.0.1  -            cisco-nx  unlocked
 ```
 
-### Variation `test` 
+### Option #2: `test` 
 For this variation, the spine/leaf network will be provided through a virtual network managed in Cisco VIRL.  The steps to prepare and setup are: 
 
 1. Setup a local NSO instance on your workstation 
 1. Start the VIRL network simulation 
 1. Add the VIRL network into NSO
 
-To simplify these steps `make test` has been provided within the `Makefile` for this demo to prepare the full test network.  Before running `make test`, be sure to have NSO properly installed, and be conencted to your DevNet Sandbox reservation via VPN.  
+To simplify these steps `make test` has been provided within the `Makefile` for this demo to prepare the full test network.  Before running `make test`, be sure to have NSO properly installed, and be connected to your DevNet Sandbox reservation via VPN.  
 
-At the end of `make test` you should an output similar to this indicating the test network up up in VIRL and that NSO is connected to it.  
+At the end of `make test` you should get an output similar to the one below, indicating the test network is up in VIRL and that NSO is connected to it.  
 
 ```
 Here are your VIRL node status.
@@ -108,10 +119,10 @@ spine2  172.16.30.172  -            cisco-nx  unlocked
 ```
 
 ## Running the Demo
-> Note: the following walkthrough provides the high level steps needed to run the demo, and provides some context and background on the technologies involved, however some background in VXLAN-EVPN Data Center design, is assumed.  
+> Note: the following walk-through provides the high-level steps needed to run the demo, and provides some context and background on the technologies involved. However, some background in VXLAN-EVPN Data Center design is assumed.  
 
 ### How it looks without Network Services 
-If you were to configure a VXLAN-EVPN fabric and tenants without a network service, you would do so by sending device based configuration out to all the spines and leafs in the topology.  This could be done through CLI configuration or using a programmatic interface like NETCONF or NX-API.  There are two high level steps involved in this... 
+If you were to configure a VXLAN-EVPN fabric and tenants without a network service, you would do so by sending device based configuration out to all the spines and leafs in the topology.  This could be done through CLI configuration or using a programmatic interface like NETCONF or NX-API.  There are two high level steps involved in this:
 
 > Note, in this part of the demo we'll be looking at device CLI configurations for VXLAN-EVPN, but we will **not** be actually configuring the network with them.  
 
@@ -121,11 +132,11 @@ Before you could add tenants, you need to configure the basic fabric and underla
 
 #### Step 2: Adding a Tenant to the Fabric 
 
-Once the fabric is setup and functional, now you can add Tenants and their network segments to the fabric.  Again, this could be done using CLI or device interfaces.  Take a look at [`device-model-examples/device-cli-example-tenant-1-setup.txt`](device-model-examples/device-cli-example-tenant-1-setup.txt) for a basic Tenant initialization.  This tenant inludes 2 network segments, and a few ports on one of the leafs in the fabric.  Even for this small of a Tenant, there is a lot of device based configuration that needs to be generated.  
+Once the fabric is setup and functional, now you can add Tenants and their network segments to the fabric.  Again, this could be done using CLI or device interfaces.  Take a look at [`device-model-examples/device-cli-example-tenant-1-setup.txt`](device-model-examples/device-cli-example-tenant-1-setup.txt) for a basic Tenant initialization.  This tenant inludes 2 network segments, and a few ports on one of the leaves in the fabric.  Even for this small of a Tenant, there is a lot of device-based configuration that needs to be generated (90 lines of CLI commands).  
 
 #### Step 2a: Adding a Network Segment to an Existing Tenant 
 
-Let's suppose you wanted to add a new segment to an existing tenant.  Checkout the configuration needed to accomplish this task by looking at [`device-model-examples/device-cli-example-tenant-1-segment.txt`](device-model-examples/device-cli-example-tenant-1-segment.txt)
+Let's suppose you wanted to add a new segment to an existing tenant.  Checkout the configuration needed to accomplish this task by looking at [`device-model-examples/device-cli-example-tenant-1-segment.txt`](device-model-examples/device-cli-example-tenant-1-segment.txt) (even something simple as adding a new segment to a single tenant requires 25 lines of CLI commands).
 
 ### Now a better way... Network Services. 
 
@@ -145,7 +156,7 @@ The goal of the first part of the demo is to show the current state without netw
     admin@svc_demo#
     ```
 
-1. Look at the configuration on `spine1`. Look through the configuration and notice that there is no evpn config... even the features aren't enabled yet.  
+1. Look at the configuration on `spine1`. Look through the configuration and notice that there is no EVPN config... even the features aren't enabled yet.  
 
     ```
     devices device spine1 live-status exec show running-config
@@ -182,7 +193,7 @@ The goal of the first part of the demo is to show the current state without netw
     devices device leaf1 live-status exec show running-config
     ```
 
-1. Feel free to check the other network devices... 
+1. Feel free to check the other network devices.
 
 1. Exit out of NSO with `exit` to return to your terminal. 
 
@@ -222,15 +233,26 @@ The goal of the first part of the demo is to show the current state without netw
             +--rw interface?   string
     ```
 
-1. Now let's use the model to configure the fabric.  
-1. Jump back into NSO and enter config mode. 
+1. Now we need to load the VXLAN-EVPN package into NSO. But before loading a package the YANG data module has to be compiled into _fxs_ files that can be loaded into NSO.
+
+    ```
+    make -C packages/vxlan-evpn/src
+    ```
+
+1. Now is the time to go into NSO and reload the packages.
 
     ```
     ncs_cli -C -u admin
+    packages reload
+    ```
+
+1. Now let's use the model to configure the fabric, so jump back into NSO config mode. 
+
+    ```
     config 
     ```
 
-1. Enter this configuration to setup the fabric.  
+1. Enter this configuration to setup the fabric.  Please note this configuration only includes meaningful and relevant information to create the fabric, the data that is really required.
 
     ```
     vxlan-fabric fabric1
@@ -282,7 +304,7 @@ The goal of the first part of the demo is to show the current state without netw
     devices device leaf1 live-status exec show running-config
     ```
 
-1. Network Services can also include actions, such as verifications.  Let's use the `verify` action to see if the fabric is healthy.  
+1. Network Services can also include actions, such as verifications.  Let's use the `verify` action to see if the fabric is _healthy_.  
     * **NOTE: If you are running with `dev` and netsim, the output from `verify` will show `NOT READY` because netsim doesn't actually build a control plane for OSPF/BGP.**
 
     ```
@@ -300,10 +322,10 @@ The goal of the first part of the demo is to show the current state without netw
     ready true
     ```
 
-1. Exit out of nso with `exit`. 
+1. Exit out of NSO with `exit`. 
 
 #### Step 2: Adding a Tenant to the Fabric 
-Setting up the fabric was super easy... let's checkout the tenant.  
+Setting up the fabric was super easy! Let's checkout how to create a tenant.  
 
 1. Like with the fabric, let's start by looking at the yang model for the tenant.  Notice how the `fabric` leaf is a reference to the `fabric` service, and similar with the `leaf` under `connections`.
 
@@ -327,7 +349,7 @@ Setting up the fabric was super easy... let's checkout the tenant.
             +--rw mode?    enumeration
     ```
 
-1. Let's setup that simple `Tenant-1`.  
+1. Let's setup a simple `Tenant-1`.  
 
     ```
     # Log into NSO again and jump into config mode
@@ -354,9 +376,9 @@ Setting up the fabric was super easy... let's checkout the tenant.
     end
     ```
 
-1. Now look at the configuration on `leaf1` again.  You should now see the tenant specific configuration
-    > Note: As this tenant only has connections on leaf1, only that leaf will be configured.  
-    > Note: It may take up to 2 minutes for the configurations to be fully pushed out to the devices.  
+1. Now look at the configuration on `leaf1` again.  You should now see the tenant specific configuration.
+    > Note 1: as this tenant only has connections on leaf1, only that leaf will be configured.  
+    > Note 2: it may take up to 2 minutes for the configurations to be fully pushed out to the devices.  
 
     ```
     devices device leaf1 live-status exec show running-config
@@ -371,7 +393,7 @@ With Tenant-1 configured in the network, it's easy to add a third segment to it.
     config
     ```
 
-1. Add `Seg3` to the existing tenant.  
+1. Add the new `Seg3` to the existing tenant.  
 
     ```
     vxlan-tenant Tenant-1
@@ -388,8 +410,15 @@ With Tenant-1 configured in the network, it's easy to add a third segment to it.
     commit
     ```
 
+1. You may now look at the configuration on `leaf1` again.  You should now see the new segment configuration.
+    > Note: it may take up to 2 minutes for the configurations to be fully pushed out to the device.  
+
+    ```
+    devices device leaf1 live-status exec show running-config
+    ```
+
 #### Bonus 1: A More Complicated Tenant 
-Tenant-1 was pretty simple.. it only existed on 1 leaf, and had very basic connections.  Here's a configuration for a more complex tenant.  This one is on all the leafs, and has both trunk and and access style connections. 
+Tenant-1 was pretty simple... it only existed on one leaf, and had very basic connections.  Let's try with the configuration for a more _complex_ tenant.  This one is on all the leafs, and has both _trunk_ and _access_ style connections. 
 
 ```
 vxlan-tenant Demo-Tenant
@@ -428,20 +457,28 @@ connection leaf3 1/13 mode access
 connection leaf4 1/13 mode access
 ```
 
-#### Bonus 2: What about when a Tenant Goes Away... 
-If configuring new things in the network is complicated... un-configuring things is a step above in complications.  It's hard to track what parts of the configuration relate to some specific feature... this results in the removal of configuration somethign that is often avoided, or not done at all... stranding bits of configuration all over the network.  Network Services package up and track the changes related to an instance of a service, so removing the configuration is super simply.  Let's see it in action!  
+1. You may check the configuration for the different fabric devices and see the new tenant specific configuration. 
+    > Note: it may take up to 2 minutes for the configurations to be fully pushed out to the devices.  
 
-1. If you arne't, jump into NSO cli and config mode.  
+    ```
+    devices device leaf1 live-status exec show running-config
+    devices device spine1 live-status exec show running-config
+    ```
+
+#### Bonus 2: What about de-commisioning services? 
+If configuring new things in the network is complicated... un-configuring things is a step above in complications.  It's hard to track what parts of the configuration relate to some specific feature. This results in the removal of configuration something that is often avoided, or not done at all... stranding bits of configuration all over the network.  Network Services package up and track the changes related to an instance of a service, so removing the configuration is super simple.  Let's see it in action!  
+
+1. If you aren't, jump into NSO CLI and config mode.  
 1. Remove the configuration for `Tenant-1`. *Don't commit it yet.*  
 
     ```
     no vxlan-tenant Tenant-1
     ```
 
-1. Let's see what will be removed by doing a dry-run of the commit.  We include `outformat native` to see the raw CLI configuration being sent to the device. 
+1. Let's see what will be removed by doing a _dry-run_ of the commit.  We include `outformat native` to see the raw CLI configuration being sent to the device. 
 
     ```
-    commit dry-run outformat native
+    commit dry-run outformat native | more
 
     # Output 
     native {
@@ -494,6 +531,10 @@ If configuring new things in the network is complicated... un-configuring things
     ```
     commit
     ```
+
+1. Try the same process and delete the _complex_ tenant (Demo-Tenant). The `commit dry-run` command will show you how your single de-commision command translates into 146 CLI commands in all devices across the fabric.
+
+1. You might now de-commision the complete fabric with a single command (`no vxlan-fabric fabric1`) and you would see how it translates into 224 CLI commands to all underlying devices.
 
 ## Cleaning Up the Demo 
 When you are done with the demo, you can run `make clean` to destroy the VIRL and/or netsim networks, as well as clear out the local NSO installation we've been using.  

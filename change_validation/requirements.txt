@@ -79,7 +79,7 @@ tabulate==0.8.3
 textfsm==1.1.0
 tqdm==4.34.0
 unicon==19.7.5
-urllib3==1.25.3
+urllib3==1.25.8
 virlutils==0.8.8
 websocket-client==0.56.0
 Werkzeug==0.15.5
